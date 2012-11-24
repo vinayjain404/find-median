@@ -10,7 +10,65 @@ def find_median(filename):
 	refresh_data_directory()
 	number_of_elements = get_number_of_elements(filename)
 	block_size = (number_of_elements / MAX_FILE_SIZE)
-	input_files = split_input_data(filename, block_size)
+	input_filenames = split_input_data(filename, block_size)
+	buffer_size = block_size / len(input_filenames)
+
+	# create file objects for the input data files
+	input_files = [open(filename) for filename in input_filenames]
+
+	# fill initial data structure
+	input_buffer = []
+	for file in input_files:
+		lines_read = 0
+		buffer = []
+		while lines_read < buffer_size:
+			data = file.readline()
+			if not data:
+				break
+			lines_read += 1
+			buffer.append(int(data.strip()))
+
+		input_buffer.append(buffer)
+
+	merging(input_buffer)
+
+def merging(input_buffer):
+	while True:
+		smallest_element_list = [(buffer[0], i) for i, buffer in enumerate(input_buffer) if len(buffer) > 0]
+
+		if not smallest_element_list:
+			store_min_element(min_element, 11, True)
+			return
+
+		min_element, min_index = min(smallest_element_list)
+		input_buffer[min_index].pop(0)
+		store_min_element(min_element, 11)
+
+output_buffer = []
+output_filename_counter = 0
+output_file = None
+
+def store_min_element(min_element, buffer_size, forced_write=False):
+	global output_file, output_buffer, output_filename_counter
+
+	if forced_write:
+		for num in output_buffer:
+			output_file.write('%s\n' %num)
+		output_file.close()
+		return
+
+	if len(output_buffer) % buffer_size == 0:
+		if output_file:
+			for num in output_buffer:
+				output_file.write('%s\n' %num)
+			output_buffer = []
+			output_file.close()
+
+		filename = os.path.join(DATA_DIRECTORY, 'output%s.data' %output_filename_counter)
+		output_file = open(filename, 'w')
+		output_filename_counter += 1
+
+	output_buffer.append(min_element)
 
 def refresh_data_directory():
 	# Create data directory if it does not exist and empty it if it does
@@ -56,6 +114,7 @@ def split_input_data(filename, block_size):
 	# store the numbers in the last file
 	for sorted_num in sorted(num_data):
 		input_file.write('%s\n' %sorted_num)
+
 	input_file.close()
 	return input_filenames
 
