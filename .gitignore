@@ -1,0 +1,6 @@
+# swap files
+*.sw[p|o]
+
+# data files
+input.data
+data/*
