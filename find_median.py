@@ -30,25 +30,26 @@ def find_median(filename):
 
 		input_buffer.append(buffer)
 
-	merging(input_buffer)
+	merging(input_buffer, block_size)
 
-def merging(input_buffer):
+def merging(input_buffer, block_size):
 	while True:
 		smallest_element_list = [(buffer[0], i) for i, buffer in enumerate(input_buffer) if len(buffer) > 0]
+		print smallest_element_list
 
 		if not smallest_element_list:
-			store_min_element(min_element, 11, True)
+			store_min_element(min_element, block_size, True)
 			return
 
 		min_element, min_index = min(smallest_element_list)
 		input_buffer[min_index].pop(0)
-		store_min_element(min_element, 11)
+		store_min_element(min_element, block_size)
 
 output_buffer = []
 output_filename_counter = 0
 output_file = None
 
-def store_min_element(min_element, buffer_size, forced_write=False):
+def store_min_element(min_element, block_size, forced_write=False):
 	global output_file, output_buffer, output_filename_counter
 
 	if forced_write:
@@ -57,7 +58,7 @@ def store_min_element(min_element, buffer_size, forced_write=False):
 		output_file.close()
 		return
 
-	if len(output_buffer) % buffer_size == 0:
+	if len(output_buffer) % block_size == 0:
 		if output_file:
 			for num in output_buffer:
 				output_file.write('%s\n' %num)
