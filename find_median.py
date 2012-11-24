@@ -32,6 +32,13 @@ def find_median(filename):
 
 	merging(input_buffer, block_size, buffer_size, input_files)
 
+	file_number = (number_of_elements / 2) / block_size
+	index_number = (number_of_elements / 2) % block_size
+	return fetch_median(file_number, index_number)
+
+def fetch_median(file_number, index_number):
+	return open(output_files[file_number]).readlines()[index_number]
+
 def merging(input_buffer, block_size, buffer_size, input_files):
 	while True:
 		smallest_element_list = [(buffer[0], i) for i, buffer in enumerate(input_buffer) if len(buffer) > 0]
@@ -61,6 +68,7 @@ def merging(input_buffer, block_size, buffer_size, input_files):
 output_buffer = []
 output_filename_counter = 0
 output_file = None
+output_files = []
 
 def store_min_element(min_element, block_size, forced_write=False):
 	global output_file, output_buffer, output_filename_counter
@@ -81,6 +89,7 @@ def store_min_element(min_element, block_size, forced_write=False):
 		filename = os.path.join(DATA_DIRECTORY, 'output%s.data' %output_filename_counter)
 		output_file = open(filename, 'w')
 		output_filename_counter += 1
+		output_files.append(filename)
 
 	output_buffer.append(min_element)
 
@@ -133,4 +142,4 @@ def split_input_data(filename, block_size):
 	return input_filenames
 
 if __name__ == "__main__":
-	find_median(sys.argv[1])
+	print find_median(sys.argv[1])
