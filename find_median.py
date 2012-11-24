@@ -34,16 +34,13 @@ def find_median(filename):
 
 def merging(input_buffer, block_size, buffer_size, input_files):
 	while True:
-		print input_buffer
 		smallest_element_list = [(buffer[0], i) for i, buffer in enumerate(input_buffer) if len(buffer) > 0]
-		print smallest_element_list
 
 		if not smallest_element_list:
 			store_min_element(min_element, block_size, True)
 			return
 
 		min_element, min_index = min(smallest_element_list)
-		print "***", min_element, min_index
 		input_buffer[min_index].pop(0)
 
 		if len(input_buffer[min_index]) == 0:
