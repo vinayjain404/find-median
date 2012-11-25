@@ -66,10 +66,10 @@ def merge_numbers(input_buffers, max_capacity, input_buffer_size, input_files):
 		into output files of max_capacity.
 
 		Arguments:
-		input_buffers pre filled buffers with numbers from each file
-		max_capacity max capacity of each node/resource
-		input_buffer_size max size of each input buffer
-		input_files list of file objects for each input file
+		input_buffers: pre filled buffers with numbers from each file
+		max_capacity: max capacity of each node/resource
+		input_buffer_size: max size of each input buffer
+		input_files: list of file objects for each input file
 	"""
 	while True:
 		# build a list of smallest elements and index for each of the
@@ -161,9 +161,9 @@ def get_number_of_elements(filename):
 
 def split_input_data(filename, max_capacity):
 	"""
-		Split the given numbers in a single file in multiple files of
+		Split the given numbers in a single file into multiple files of
 		max_capacity.
-		Return the split input filenames.
+		Return a list of split input filenames.
 	"""
 	num_count = 0
 	num_data = []
@@ -205,4 +205,5 @@ def split_input_data(filename, max_capacity):
 	return input_filenames
 
 if __name__ == "__main__":
-	print find_median(sys.argv[1])
+	median = find_median(sys.argv[1])
+	print "Median is %s" %median
