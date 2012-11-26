@@ -20,7 +20,7 @@ def find_median(filename):
 	# if there are less then 100 elements then find median directly
 	# as current algorithm does not support manipulating 10 input files
 	# with max capacity less then 10 i.e len(elements) < 100
-	if max_capacity < 100:
+	if number_of_elements < 100:
 		return find_median_for_small_list(filename)
 
 	input_filenames = split_input_data(filename, max_capacity)
@@ -36,14 +36,14 @@ def find_median(filename):
 		numbers = read_numbers_from_file(file, input_buffer_size)
 		input_buffers.append(numbers)
 
-	merge_numbers(input_buffers, max_capacity, input_buffer_size, input_files)
+	output_files = merge_numbers(input_buffers, max_capacity, input_buffer_size, input_files)
 
 	# remove 1 as list are indexed from 0
-	median_element_index = (number_of_elements / 2) - 1
+	median_element_index = (number_of_elements -1) / 2
 
 	file_number =  median_element_index / max_capacity
 	index_number = median_element_index % max_capacity
-	return fetch_value(file_number, index_number)
+	return fetch_value(output_files[file_number], index_number)
 
 def find_median_for_small_list(filename):
 	"""
@@ -52,7 +52,7 @@ def find_median_for_small_list(filename):
 	file = open(filename)
 	len_numbers = int(file.readline().strip())
 	numbers = sorted([int(num.strip()) for num in file.readlines()])
-	return numbers[(len(numbers)-1)/2]
+	return numbers[(len_numbers-1)/2]
 
 def read_numbers_from_file(file, max_size):
 	"""
@@ -69,17 +69,19 @@ def read_numbers_from_file(file, max_size):
 		numbers.append(int(data.strip()))
 	return numbers
 
-def fetch_value(file_number, index_number):
+def fetch_value(filename, index_number):
 	"""
 		Return a value at an index from a given file.
 	"""
-	return open(output_files[file_number]).readlines()[index_number]
+	value = open(filename).readlines()[index_number]
+	return int(value.strip())
 
 def merge_numbers(input_buffers, max_capacity, input_buffer_size, input_files):
 	"""
 		Given a set of buffered numbers for each input file perform a
 		merge to sort them. The sorted numbers are successively stored
 		into output files of max_capacity.
+		Returns a list of output files created.
 
 		Arguments:
 		input_buffers: pre filled buffers with numbers from each file
@@ -87,6 +89,8 @@ def merge_numbers(input_buffers, max_capacity, input_buffer_size, input_files):
 		input_buffer_size: max size of each input buffer
 		input_files: list of file objects for each input file
 	"""
+
+	buffer_write = BufferedWrite(max_capacity)
 	while True:
 		# build a list of smallest elements and index for each of the
 		# input buffers if they are not empty
@@ -96,8 +100,8 @@ def merge_numbers(input_buffers, max_capacity, input_buffer_size, input_files):
 
 		# save the buffered elements to disk if all input buffers empty
 		if not smallest_element_list:
-			buffer_and_write_numbers(min_element, max_capacity, True)
-			return
+			buffer_write.flush()
+			return buffer_write.files
 
 		# find the smallest element in the input buffers
 		min_element, min_index = min(smallest_element_list)
@@ -113,46 +117,50 @@ def merge_numbers(input_buffers, max_capacity, input_buffer_size, input_files):
 				input_buffer_size)
 			input_buffers[min_index].extend(numbers)
 
-		buffer_and_write_numbers(min_element, max_capacity)
+		buffer_write.write(min_element)
 
-# TODO To not use global variables and abstract it into its own class
-output_buffer = []
-output_file = None
-output_files = []
-output_filename_counter = 0
-
-def buffer_and_write_numbers(number, max_capacity, forced_write=False):
+class BufferedWrite:
 	"""
-		Buffers and writes a set of numbers into output files in
-		batches of size max_capacity.
-		forced_write: is True the current set of numbers are written
-		to a file even if the batch is not of max_capacity.
+		Class to handle buffered writes to a file in batches of
+		size max_capacity.
 	"""
-	global output_file, output_buffer, output_filename_counter
 
-	if forced_write:
-		for num in output_buffer:
-			output_file.write('%s\n' %num)
-		output_file.close()
-		return
+	def __init__(self, max_capacity):
+		self.max_capacity = max_capacity
+		self.buffer = []
+		self.file = None
+		self.files = []
+		self.filename_counter = 0
 
-	# write the buffer to disk if buffer size is equal to max_capacity
-	if len(output_buffer) % max_capacity == 0:
-		if output_file:
-			for num in output_buffer:
-				output_file.write('%s\n' %num)
-			output_buffer = []
-			output_file.close()
+	def write(self, number):
+		"""
+			Writes a number to the buffer or disk if buffer size is
+			equal to max_capacity.
+		"""
+		if (len(self.buffer) % self.max_capacity) == 0:
+			if self.file:
+				for num in self.buffer:
+					self.file.write('%s\n' %num)
+				self.buffer = []
+				self.file.close()
 
-		filename = os.path.join(
-			DATA_DIRECTORY,
-			'output%s.data' %output_filename_counter)
+			filename = os.path.join(
+				DATA_DIRECTORY,
+				'output%s.data' %self.filename_counter)
 
-		output_file = open(filename, 'w')
-		output_filename_counter += 1
-		output_files.append(filename)
+			self.file = open(filename, 'w')
+			self.filename_counter += 1
+			self.files.append(filename)
 
-	output_buffer.append(number)
+		self.buffer.append(number)
+
+	def flush(self):
+		"""
+			Writes the buffer to disk if called.
+		"""
+		for num in self.buffer:
+			self.file.write('%s\n' %num)
+		self.file.close()
 
 def refresh_data_directory():
 	"""

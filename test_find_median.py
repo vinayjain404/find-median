@@ -17,15 +17,22 @@ class FindMedianTestCase(unittest.TestCase):
 	def tearDown(self):
 		os.remove(self.test_filename)
 
-	def testFindMedianLargeSet(self):
+	def testFindMedianForLargeSet(self):
 		self.create_input_file(range(500000))
 		expected_median = 249999
 		actual_median = find_median.find_median(self.test_filename)
 		self.assertEqual(expected_median, actual_median)
 
-	def testFindMedianSmallSet(self):
+	def testFindMedianForSmallSet(self):
 		self.create_input_file(range(50))
 		expected_median = 24
+		actual_median = find_median.find_median(self.test_filename)
+		self.assertEqual(expected_median, actual_median)
+
+	def testFindMedianWithDuplicateAndNegativeValues(self):
+		numbers = ['-1'] * 100 + range(50)
+		self.create_input_file(numbers)
+		expected_median = -1
 		actual_median = find_median.find_median(self.test_filename)
 		self.assertEqual(expected_median, actual_median)
 
