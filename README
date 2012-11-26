@@ -1,0 +1,30 @@
+Find Median of a given set of numbers without loading entire set into the memory:
+
+Usage:
+	python find_median.py <path-to-input-file>
+
+Example:
+	python find_median.py examples/input.data 
+	
+Input file format:
+	The first line of the input file is "number count".
+
+Constraint:
+- None of the functions process more then max_capacity numbers at a time
+- This algorithm has higher time complexity in lieu of space constraint
+
+Algorithm:
+- Calculate the max capacity for the system (number count / 10)
+- Split a give input file of numbers into smaller sorted files each of size max
+  capacity -- O(nlogn * n) 
+- Create input buffers corresponding to each split file with the total
+  buffer size of max capacity -- O(n)
+- Merge the input buffer and write to output files via a buffer of max capacity
+  size -- O(n)
+- If a input buffer for a file is empty refill it and continue it until all the
+  split files have been processed -- O(n * n)
+- Return the median from the sorted numbers stored sequentially in output files
+  -- O(1)
+
+Time complexity:
+	O(nlogn * n)
