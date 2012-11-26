@@ -1,3 +1,6 @@
+# python compiled files
+*.py[c|o]
+
 # swap files
 *.sw[p|o]
 

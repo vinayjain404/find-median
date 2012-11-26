@@ -16,6 +16,13 @@ def find_median(filename):
 	refresh_data_directory()
 	number_of_elements = get_number_of_elements(filename)
 	max_capacity = number_of_elements / SCALED_DOWN_FACTOR
+
+	# if there are less then 100 elements then find median directly
+	# as current algorithm does not support manipulating 10 input files
+	# with max capacity less then 10 i.e len(elements) < 100
+	if max_capacity < 100:
+		return find_median_for_small_list(filename)
+
 	input_filenames = split_input_data(filename, max_capacity)
 	input_buffer_size = max_capacity / len(input_filenames)
 
@@ -37,6 +44,15 @@ def find_median(filename):
 	file_number =  median_element_index / max_capacity
 	index_number = median_element_index % max_capacity
 	return fetch_value(file_number, index_number)
+
+def find_median_for_small_list(filename):
+	"""
+		Returns median for a small list of numbers
+	"""
+	file = open(filename)
+	len_numbers = int(file.readline().strip())
+	numbers = sorted([int(num.strip()) for num in file.readlines()])
+	return numbers[(len(numbers)-1)/2]
 
 def read_numbers_from_file(file, max_size):
 	"""
