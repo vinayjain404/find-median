@@ -11,7 +11,8 @@ SCALED_DOWN_FACTOR = 10
 def find_median(filename):
 	"""
 		Return the median of a list of numbers in a given file.
-		Argument is name of the file containing the list of numbers.
+		Argument is name of the file containing the count and
+		list of numbers.
 	"""
 	refresh_data_directory()
 	number_of_elements = get_number_of_elements(filename)
