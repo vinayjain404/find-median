@@ -1,20 +1,26 @@
 import os
 import random
+import shutil
 import tempfile
 import unittest
 
 import find_median
 
-def data_dir():
+def get_data_dir():
+	"""
+		Get a temporary directory.
+	"""
 	return tempfile.mkdtemp()
 
 class FindMedianTestCase(unittest.TestCase):
 	def setUp(self):
-		find_median.DATA_DIRECTORY = data_dir()
-		self.test_filename = os.path.join(data_dir(), 'test.data')
+		self.data_dir = get_data_dir()
+		find_median.DATA_DIRECTORY = self.data_dir
+		self.test_filename = os.path.join(get_data_dir(), 'test.data')
 		self.test_file = open(self.test_filename, 'w')
 
 	def tearDown(self):
+		shutil.rmtree(self.data_dir)
 		os.remove(self.test_filename)
 
 	def testFindMedianForLargeSet(self):
@@ -37,6 +43,10 @@ class FindMedianTestCase(unittest.TestCase):
 		self.assertEqual(expected_median, actual_median)
 
 	def create_input_file(self, numbers):
+		"""
+			Write a list of numbers to the test input file with
+			random shuffling.
+		"""
 		random.shuffle(numbers)
 		self.test_file.write('%s\n' %len(numbers))
 		for num in numbers:
