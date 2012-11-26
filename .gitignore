@@ -5,5 +5,4 @@
 *.sw[p|o]
 
 # data files
-input.data
 data/*
