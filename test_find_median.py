@@ -23,6 +23,12 @@ class FindMedianTestCase(unittest.TestCase):
 		shutil.rmtree(self.data_dir)
 		os.remove(self.test_filename)
 
+	def testFindMedianForUnEqualBucketSet(self):
+		self.create_input_file(range(502))
+		expected_median = 250
+		actual_median = find_median.find_median(self.test_filename)
+		self.assertEqual(expected_median, actual_median)
+
 	def testFindMedianForLargeSet(self):
 		self.create_input_file(range(500000))
 		expected_median = 249999
